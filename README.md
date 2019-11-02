@@ -14,3 +14,5 @@ Those posts gave these commands (on linux host):
  * `Openssl x509 -noout -in statuscake-cert.pem -fingerprint -sha1`
 Get end bit of:
  * `SHA1 Fingerprint=07:ED:A2:C1:4C:E6:76:FA:C6:F7:02:B3:52:8C:AE:5A:9D:01:96:1D`
+
+TODO: SHA1 key might change. ESP32 bsides work showed ESP32 can take whole certificate and verify it. If SHA1 key changes on statuscake then see if ESP8266 can do this or change to ESP32.
