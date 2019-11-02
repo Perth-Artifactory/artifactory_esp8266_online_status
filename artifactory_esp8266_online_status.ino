@@ -18,10 +18,6 @@
  *  openssl x509 -noout -in statuscake-cert.pem -fingerprint -sha1
  * Get end bit of:
  *  SHA1 Fingerprint=07:ED:A2:C1:4C:E6:76:FA:C6:F7:02:B3:52:8C:AE:5A:9D:01:96:1D
- *
- * TODO: SHA1 key might change. ESP32 bsides work showed ESP32 can take whole 
- * certificate and verify it. If SHA1 key changes on statuscake then see if 
- * ESP8266 can do this or change to ESP32.
  * 
  * Date 2019-11-02
 */
@@ -41,8 +37,52 @@ ESP8266WiFiMulti WiFiMulti;
 const char* url = "https://push.statuscake.com/?PK=3dc5296d8883eda&TestID=5273311&time=0";
 const char* fingerprint = "07:ED:A2:C1:4C:E6:76:FA:C6:F7:02:B3:52:8C:AE:5A:9D:01:96:1D";
 
+const int pinR = D1;
+const int pinB = D2;
+const int pinG = D3;
+
+void ledOff() {
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinG, HIGH);
+  digitalWrite(pinR, HIGH);
+}
+
+void ledWhite() {
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinG, LOW);
+  digitalWrite(pinR, LOW);
+}
+
+void ledRed() {
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinG, HIGH);
+  digitalWrite(pinR, LOW);
+}
+
+void ledGreen() {
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinG, LOW);
+  digitalWrite(pinR, HIGH);
+}
+
+void ledBlue() {
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinG, HIGH);
+  digitalWrite(pinR, HIGH);
+}
 
 void setup() {
+  USE_SERIAL.println("Artifactory ESP8266 Online Status");
+  USE_SERIAL.flush();
+
+  pinMode(pinB, OUTPUT);
+  pinMode(pinG, OUTPUT);
+  pinMode(pinR, OUTPUT);
+
+  ledWhite(); delay(1000);
+  ledRed();   delay(1000);
+  ledGreen(); delay(1000);
+  ledBlue();  delay(1000);
 
   USE_SERIAL.begin(115200);
   // USE_SERIAL.setDebugOutput(true);
@@ -51,12 +91,8 @@ void setup() {
   USE_SERIAL.println();
   USE_SERIAL.println();
 
-  for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
-    delay(1000);
-  }
-
+  USE_SERIAL.println("Start Wifi");
+  USE_SERIAL.flush();
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("Artifactory", "KEEP DOOR CLOSED");
 
@@ -65,6 +101,8 @@ void setup() {
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
+
+    ledBlue();
 
     HTTPClient http;
 
@@ -85,14 +123,20 @@ void loop() {
 
       // file found at server
       if (httpCode == HTTP_CODE_OK) {
+        ledGreen();
         String payload = http.getString();
         USE_SERIAL.println(payload);
+      } else {
+        ledRed();
       }
     } else {
+      ledRed();
       USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
     }
 
     http.end();
+  } else {
+    ledRed();
   }
 
   delay(10000);
