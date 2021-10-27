@@ -34,9 +34,9 @@ void setup() {
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
+  Serial.println();
+  Serial.println();
   Serial.println("ESP8266 Online Status Push");
-  Serial.flush();
-
   Serial.println();
   Serial.println();
 
