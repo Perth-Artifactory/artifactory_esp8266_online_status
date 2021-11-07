@@ -2,21 +2,28 @@
  * ESP8266 Online Status
  * by Blake Samuels aka Tazard
  * 
- * Minimal modification of BasicHTTPClient.ino for use as
- * online status tool using statuscake. GETs a URL at 
- * statuscake every 10s to report if Artifactory internet 
- * is online at the space.
+ * Periodically call a URL to show that this device is 
+ * powered and can reach the internet. Can be used as
+ * part of internet connectivity monitor, wifi monitor,
+ * or to show when some piece of Artifactory equipment
+ * is inadvertently left on.
+ * 
+ * Its a minimal modification of BasicHTTPClient.ino 
+ * example for ESP8266 and will call a HTTPS URL at 
+ * given interval (e.g. statuscake, healthchecks.io).
  * 
  * Major Update, Date 2021-10-27
 */
 
 // Set WIFI details
-const char* const SSID = "Artifactory";
-const char* const PASSWORD = "KEEP DOOR CLOSED";
+const char* const SSID = "SSID";
+const char* const PASSWORD = "PASSWORD";
 
-// Set statuscake URL
-const char* const URL = "https://push.statuscake.com/?PK=3dc5296d8883eda&TestID=5273311&time=0";
+// URL to periodically GET (e.g. statuscake push)
+const char* const URL = "https://push.statuscake.com/?...";
 
+// Time between calling URL (milliseconds)
+unsigned long DELAY = 10000;
 
 #include <Arduino.h>
 
@@ -89,5 +96,5 @@ void loop() {
   }
 
   Serial.println("Wait 10s before next round...");
-  delay(10000);
+  delay(DELAY);
 }
