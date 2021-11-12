@@ -55,6 +55,9 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(SSID, PASSWORD);
+  
+  // enable onboard LED for status notifications
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -84,14 +87,22 @@ void loop() {
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
           String payload = https.getString();
           Serial.println(payload);
+          
+          // we pinged successfully, status LED on
+          digitalWrite(LED_BUILTIN, LOW); 
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        
+        // we aren't pinging correctly, status LED off
+        digitalWrite(LED_BUILTIN, HIGH);
       }
 
       https.end();
     } else {
       Serial.printf("[HTTPS] Unable to connect\n");
+      // we aren't pinging correctly, status LED off
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
 
